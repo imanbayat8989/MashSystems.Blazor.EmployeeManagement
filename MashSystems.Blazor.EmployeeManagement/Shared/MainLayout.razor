@@ -1,17 +1,22 @@
 ﻿@inherits LayoutComponentBase
 
-<PageTitle>MashSystems.Blazor.EmployeeManagement</PageTitle>
+<PageTitle>MashSystems</PageTitle>
 
 <div class="page">
     <div class="sidebar">
         <NavMenu />
     </div>
-
-    <main>
-        
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
+    <AuthorizeView>
+        <Authorized>
+            <main>
+                <article class="content px-4">
+                    @Body
+                </article>
+            </main>
+        </Authorized>
+        <NotAuthorized>
+            <h3>Not Authorized</h3>
+        </NotAuthorized>
+    </AuthorizeView>
+  
 </div>
