@@ -5,6 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
+var connectionstring = builder.Configuration.GetConnectionString("DefaultConnection");
 
 var app = builder.Build();
 
