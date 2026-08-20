@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MashSystems.Blazor.EmployeeManagement.Data;
 using Microsoft.AspNetCore.Identity;
+using MashSystems.Blazor.EmployeeManagement.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,10 +9,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+
 var connectionstring = builder.Configuration.GetConnectionString("DefaultConnection");
 
 // THIS WAS MISSING: Register DataContext with SQL Server
-builder.Services.AddDbContext<DataContext>(options =>
+builder.Services.AddDbContextFactory<DataContext>(options =>
     options.UseSqlServer(connectionstring));
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>

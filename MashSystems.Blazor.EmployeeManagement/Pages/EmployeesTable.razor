@@ -1,0 +1,26 @@
+﻿@page "/"
+@using MashSystems.Blazor.EmployeeManagement.Services
+@using MashSystems.Blazor.EmployeeManagement.Models
+
+@if(Employees != null)
+{
+    <ul>
+        @foreach(var employee in Employees)
+        {
+            <li>@employee.Id - @employee.Name - @employee.Type - <img width="40" src="@employee.ImgUrl" /> -
+               @employee.Position - @employee.Salary </li>
+        }
+    </ul>
+}
+
+@code {
+    [Inject] private IEmployeeService EmployeeService { get; set; }
+    private List<Employee>? Employees;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await EmployeeService.GetEmployees();
+        Employees = response.Employees;
+    }
+
+}
