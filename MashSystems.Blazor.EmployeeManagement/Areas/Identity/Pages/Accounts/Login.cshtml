@@ -1,41 +1,417 @@
 ﻿@page
 @model LoginModel
 @{
-    <div class="h-100">
-        <div class="mask d-flex align-items-center h-100">
-            <div class="container">
-                <div class="row justify-content-center p-5">
-                    <div class="col-4">
-                        <div class="card shadow-2-strong" style="background-color:#f5f7fa">
-                            <div class="card-body">
-                                <form id="account" method="post">
-                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                                    <div class="form-floating" style="margin:10px">
-                                        <input asp-for="Input.Email" class="form-control" autocomplete="username"
-                                        aria-required="true" placeholder="E-mail"/>
-                                        <label asp-for="Input.Email" class-form-label></label>
-                                    </div>
+    ViewData["Title"] = "ورود به حساب کاربری";
+    Layout = null;
+}
 
-                                    <div class="form-floating" style="margin:10px">
-                                        <input asp-for="Input.Password" class="form-control" autocomplete="password"
-                                               aria-required="true" placeholder="password" />
-                                        <label asp-for="Input.Password" class-form-label></label>
-                                    </div>
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
 
-                                    <div style="margin:10px">
-                                    <button id="Login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log In</button>
-                                    </div>
+    <!-- Bootstrap 5 RTL CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
 
-                                    <div class="form-floating" style="margin:10px">Don't have account?'
-                                        <a href="/Identity/Accounts/Register">Sign up</a>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
+    <!-- Vazirmatn Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --admin-font: 'IRANSans', 'Vazirmatn', 'B Yekan', 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: var(--admin-font);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .login-bg-wrapper {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            /* Lighter, high-contrast violet-indigo to deep slate-violet gradient */
+            background: radial-gradient(circle at 50% 30%, #5b21b6 0%, #3b0764 50%, #1e1b4b 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .login-container-box {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 420px;
+            padding: 15px;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.96) !important;
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5) !important;
+            border-radius: 16px !important;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.4) !important;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .glass-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 25px 50px rgba(15, 23, 42, 0.5) !important;
+            }
+
+        .form-floating .form-control {
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            font-family: var(--admin-font);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-floating label {
+            font-family: var(--admin-font);
+            font-size: 0.9rem;
+        }
+
+        .form-floating .form-control:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
+        }
+
+        .btn-blazor {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: #ffffff !important;
+            border: none;
+            border-radius: 10px;
+            font-family: var(--admin-font);
+            font-weight: 600;
+            padding: 12px;
+            transition: all 0.25s ease;
+        }
+
+            .btn-blazor:hover {
+                background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+                box-shadow: 0 8px 20px rgba(79, 70, 229, 0.45);
+                transform: translateY(-1px);
+            }
+
+        .login-link {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+            .login-link:hover {
+                color: #3730a3;
+                text-decoration: underline;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="login-bg-wrapper">
+        <canvas id="particle-canvas"></canvas>
+
+        <div class="login-container-box">
+            <div class="card glass-card p-3">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <h3 class="fw-bold text-dark">خوش آمدید</h3>
+                        <p class="text-muted small">برای دسترسی به حساب کاربری خود وارد شوید</p>
                     </div>
+
+                    <form id="account" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.Email" class="form-control" autocomplete="username"
+                                   aria-required="true" placeholder="نام@نمونه.com" />
+                            <label asp-for="Input.Email">آدرس ایمیل</label>
+                            <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.Password" class="form-control" type="password" autocomplete="current-password"
+                                   aria-required="true" placeholder="رمز عبور" />
+                            <label asp-for="Input.Password">رمز عبور</label>
+                            <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <button id="Login-submit" type="submit" class="w-100 btn btn-lg btn-blazor">ورود به حساب</button>
+                        </div>
+
+                        <div class="text-center pt-2">
+                            <span class="text-muted small">حساب کاربری ندارید؟</span>
+                            <a href="/Identity/Account/Register" class="login-link small ms-1">ثبت‌نام کنید</a>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-    
     </div>
-}
+
+    <script>
+        window.addEventListener("load", () => {
+            const canvas = document.getElementById("particle-canvas");
+            if (!canvas) return;
+
+            const ctx = canvas.getContext("2d");
+
+            let width, height;
+            let particles = [];
+            let cubes = [];
+
+            const mouse = {
+                x: null,
+                y: null,
+                radius: 150
+            };
+
+            window.addEventListener("mousemove", (e) => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+            });
+
+            window.addEventListener("mouseleave", () => {
+                mouse.x = null;
+                mouse.y = null;
+            });
+
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+                initScene();
+            }
+
+            window.addEventListener("resize", resize);
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                    this.vx = (Math.random() - 0.5) * 1.5;
+                    this.vy = (Math.random() - 0.5) * 1.5;
+                    this.radius = Math.random() * 2 + 1.5;
+                    this.baseRadius = this.radius;
+                }
+
+                update() {
+                    if (this.x < 0 || this.x > width) this.vx *= -1;
+                    if (this.y < 0 || this.y > height) this.vy *= -1;
+
+                    if (mouse.x !== null && mouse.y !== null) {
+                        const dx = mouse.x - this.x;
+                        const dy = mouse.y - this.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dist < mouse.radius) {
+                            const force = (mouse.radius - dist) / mouse.radius;
+                            const forceDirectionX = dx / dist;
+                            const forceDirectionY = dy / dist;
+
+                            this.x += forceDirectionX * force * 1.2;
+                            this.y += forceDirectionY * force * 1.2;
+
+                            if (this.radius < this.baseRadius * 2) {
+                                this.radius += 0.2;
+                            }
+                        } else if (this.radius > this.baseRadius) {
+                            this.radius -= 0.1;
+                        }
+                    } else if (this.radius > this.baseRadius) {
+                        this.radius -= 0.1;
+                    }
+
+                    this.x += this.vx;
+                    this.y += this.vy;
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+                    ctx.fill();
+                }
+            }
+
+            class Cube3D {
+                constructor() {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                    this.vx = (Math.random() - 0.5) * 0.8;
+                    this.vy = (Math.random() - 0.5) * 0.8;
+
+                    this.size = Math.random() * 20 + 25;
+
+                    this.rx = Math.random() * Math.PI * 2;
+                    this.ry = Math.random() * Math.PI * 2;
+                    this.rz = Math.random() * Math.PI * 2;
+
+                    this.vrx = (Math.random() - 0.5) * 0.02;
+                    this.vry = (Math.random() - 0.5) * 0.02;
+                    this.vrz = (Math.random() - 0.5) * 0.02;
+
+                    this.opacity = Math.random() * 0.45 + 0.4;
+
+                    this.vertices = [
+                        [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],
+                        [-1, -1,  1], [1, -1,  1], [1, 1,  1], [-1, 1,  1]
+                    ];
+
+                    this.edges = [
+                        [0, 1], [1, 2], [2, 3], [3, 0],
+                        [4, 5], [5, 6], [6, 7], [7, 4],
+                        [0, 4], [1, 5], [2, 6], [3, 7]
+                    ];
+                }
+
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+
+                    if (this.x < -40) this.x = width + 40;
+                    if (this.x > width + 40) this.x = -40;
+                    if (this.y < -40) this.y = height + 40;
+                    if (this.y > height + 40) this.y = -40;
+
+                    this.rx += this.vrx;
+                    this.ry += this.vry;
+                    this.rz += this.vrz;
+                }
+
+                project(vertex) {
+                    let [x, y, z] = vertex;
+
+                    let rad = this.rx;
+                    let cos = Math.cos(rad), sin = Math.sin(rad);
+                    let y1 = y * cos - z * sin;
+                    let z1 = y * sin + z * cos;
+
+                    rad = this.ry;
+                    cos = Math.cos(rad); sin = Math.sin(rad);
+                    let x2 = x * cos + z1 * sin;
+                    let z2 = -x * sin + z1 * cos;
+
+                    rad = this.rz;
+                    cos = Math.cos(rad); sin = Math.sin(rad);
+                    let x3 = x2 * cos - y1 * sin;
+                    let y3 = x2 * sin + y1 * cos;
+
+                    const distance = 2.5;
+                    const fov = this.size;
+                    const scale = fov / (distance + z2 * 0.3);
+
+                    return {
+                        x: this.x + x3 * scale,
+                        y: this.y + y3 * scale
+                    };
+                }
+
+                draw() {
+                    const projected = this.vertices.map(v => this.project(v));
+
+                    ctx.beginPath();
+                    for (const edge of this.edges) {
+                        const p1 = projected[edge[0]];
+                        const p2 = projected[edge[1]];
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                    }
+                    /* Crisp high-contrast cyan-violet stroke */
+                    ctx.strokeStyle = `rgba(196, 181, 253, ${this.opacity})`;
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                }
+            }
+
+            function initScene() {
+                particles = [];
+                cubes = [];
+
+                const particleCount = Math.min(Math.floor((window.innerWidth * window.innerHeight) / 5000), 300);
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push(new Particle());
+                }
+
+                const cubeCount = Math.min(Math.floor((window.innerWidth * window.innerHeight) / 45000), 20);
+                for (let i = 0; i < cubeCount; i++) {
+                    cubes.push(new Cube3D());
+                }
+            }
+
+            resize();
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+
+                // 1. Particle Rendering & Connections
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dist < 110) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(224, 231, 255, ${(1 - dist / 110) * 0.5})`;
+                            ctx.lineWidth = 0.7;
+                            ctx.stroke();
+                        }
+                    }
+
+                    if (mouse.x !== null && mouse.y !== null) {
+                        const mdx = particles[i].x - mouse.x;
+                        const mdy = particles[i].y - mouse.y;
+                        const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+
+                        if (mdist < mouse.radius) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(mouse.x, mouse.y);
+                            /* Bright cyan accent on mouse proximity */
+                            ctx.strokeStyle = `rgba(165, 243, 252, ${(1 - mdist / mouse.radius) * 0.85})`;
+                            ctx.lineWidth = 1.2;
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                // 2. 3D Cube Rendering
+                for (let i = 0; i < cubes.length; i++) {
+                    cubes[i].update();
+                    cubes[i].draw();
+                }
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+        });
+    </script>
+
+</body>
+</html>
