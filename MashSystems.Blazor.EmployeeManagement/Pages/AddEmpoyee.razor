@@ -1,0 +1,69 @@
+﻿@page "/add-employee"
+@using MashSystems.Blazor.EmployeeManagement.Models;
+@using MashSystems.Blazor.EmployeeManagement.Models.DTOs;
+@using MashSystems.Blazor.EmployeeManagement.Services;
+
+<Card>
+    <div class="row user-detail-row">
+        <h3>Add New Employee</h3>
+        <div class="form-group">
+            <EditForm Model="@addEmployeeForm" OnValidSubmit="AddNewEmployee">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="addEmployeeForm.Name" class="form-control" 
+                    id="floatingInput" placeholder="Name Here!" />
+                    <label for="floatingInput">Name</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <InputNumber @bind-Value="addEmployeeForm.Salary" class="form-control"
+                               id="floatingInput" placeholder="Salary Here!" />
+                    <label for="floatingInput">Salary</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <InputSelect @bind-Value="addEmployeeForm.Type" class="form-select"
+                               id="floatingInput" placeholder="Type Here!">
+                               @foreach(EmployeeType type in Enum.GetValues(typeof(EmployeeType)))
+                        {
+                            <option value="@type">@type.GetDisplayName()</option>
+                        }
+                        <label for="floatingInput">Name</label>
+                    </InputSelect>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <InputSelect @bind-Value="addEmployeeForm.Position" class="form-select"
+                                 id="floatingInput" placeholder="Position Here!">
+                        @foreach (Position position in Enum.GetValues(typeof(Position)))
+                        {
+                            <option value="@position">@position.GetDisplayName()</option>
+                        }
+                        <label for="floatingInput">Position</label>
+                    </InputSelect>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="addEmployeeForm.ImgUrl" class="form-control"
+                               id="floatingInput" placeholder="Url Here!" />
+                    <label for="floatingInput">Image Url</label>
+                </div>
+                <button class="btn btn-outline-secondary" type="submit">Submit</button>
+            </EditForm>
+        </div>
+    </div>
+</Card>
+
+@code {
+    [Inject] private IEmployeeService EmployeeService { get; set; }
+    [Inject] private NavigationManager NavigationManager { get; set; }
+
+    private AddEmployeeForm addEmployeeForm = new();
+
+    private async Task AddNewEmployee()
+    {
+        var response = await EmployeeService.AddEmployee(addEmployeeForm);
+        NavigationManager.NavigateTo("/");
+    }
+}
