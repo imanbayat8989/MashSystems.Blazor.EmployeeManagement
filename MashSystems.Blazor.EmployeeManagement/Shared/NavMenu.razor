@@ -1,29 +1,292 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">MashSystems.Blazor.EmployeeManagement</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+﻿<style>
+    :root {
+        --nav-bg: #1e1b4b;
+        --nav-hover-bg: rgba(99, 102, 241, 0.15);
+        --nav-active-bg: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        --nav-text-color: #cbd5e1;
+        --nav-accent: #a5f3fc;
+    }
+
+    .nav-header-glass {
+        background: rgba(30, 27, 75, 0.8) !important;
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        min-height: 60px;
+    }
+
+    /* Fixed Brand Container for both Desktop and Mobile */
+    .brand-container {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        text-decoration: none;
+        max-width: 100%;
+    }
+
+    .brand-text {
+        font-size: 1.15rem;
+        font-weight: 700;
+        letter-spacing: -0.2px;
+        color: #ffffff;
+        /* تقویت اثر درخشش با ترکیب چند لایه سایه */
+        text-shadow: 0 0 8px rgba(165, 243, 252, 0.8),
+                    0 0 20px rgba(165, 243, 252, 0.5),
+                    0 0 30px rgba(99, 102, 241, 0.6);
+        white-space: nowrap;
+        line-height: 1;
+    }
+
+    .custom-nav-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--nav-text-color) !important;
+        border-radius: 10px !important;
+        padding: 10px 14px !important;
+        font-weight: 500;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .custom-nav-link:hover {
+        background-color: var(--nav-hover-bg);
+        color: #ffffff !important;
+        transform: translateX(-3px);
+    }
+
+    .custom-nav-link.active {
+        background: var(--nav-active-bg) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+    }
+
+    .nav-icon {
+        font-size: 1.25rem;
+        transition: transform 0.25s ease;
+    }
+
+    .custom-nav-link:hover .nav-icon {
+        transform: scale(1.1);
+    }
+
+    .text-danger-soft {
+        color: #fca5a5 !important;
+    }
+
+    .text-danger-soft:hover {
+        background-color: rgba(239, 68, 68, 0.12) !important;
+        color: #f87171 !important;
+    }
+
+    /* --- 3D Floating Diamond Scenes --- */
+    .eth-nav-scene {
+        width: 30px;
+        height: 40px;
+        perspective: 600px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        animation: float3D 3.5s ease-in-out infinite alternate;
+        /* درخشش پشت الماس‌ها */
+        filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.6));
+    }
+
+    .eth-nav-scene.right-side {
+        animation-delay: -1.75s;
+    }
+
+    .eth-nav-object {
+        width: 24px;
+        height: 38px;
+        position: relative;
+        transform-style: preserve-3d;
+        animation: spinNav3D 2s linear infinite;
+    }
+
+    .eth-nav-object.reverse {
+        animation: spinNav3DReverse 2s linear infinite;
+    }
+
+    .eth-nav-face {
+        position: absolute;
+        width: 24px;
+        height: 19px;
+        backface-visibility: hidden;
+        -webkit-font-smoothing: antialiased;
+        opacity: 0.95;
+    }
+
+    /* Top Pyramid Faces */
+    .eth-nav-face.top-front {
+        top: 0;
+        background: linear-gradient(180deg, #e0f2fe 0%, #38bdf8 100%);
+        clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        transform-origin: bottom center;
+        transform: translateZ(7px) rotateX(25deg);
+    }
+
+    .eth-nav-face.top-back {
+        top: 0;
+        background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+        clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        transform-origin: bottom center;
+        transform: translateZ(-7px) rotateX(-25deg) rotateY(180deg);
+    }
+
+    .eth-nav-face.top-left {
+        top: 0;
+        background: linear-gradient(180deg, #bae6fd 0%, #818cf8 100%);
+        clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        transform-origin: bottom center;
+        transform: translateX(-7px) rotateY(-90deg) rotateX(25deg);
+    }
+
+    .eth-nav-face.top-right {
+        top: 0;
+        background: linear-gradient(180deg, #818cf8 0%, #0369a1 100%);
+        clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        transform-origin: bottom center;
+        transform: translateX(7px) rotateY(90deg) rotateX(25deg);
+    }
+
+    /* Bottom Inverted Pyramid Faces */
+    .eth-nav-face.bottom-front {
+        top: 19px;
+        background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+        clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+        transform-origin: top center;
+        transform: translateZ(7px) rotateX(-25deg);
+    }
+
+    .eth-nav-face.bottom-back {
+        top: 19px;
+        background: linear-gradient(180deg, #0284c7 0%, #075985 100%);
+        clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+        transform-origin: top center;
+        transform: translateZ(-7px) rotateX(25deg) rotateY(180deg);
+    }
+
+    .eth-nav-face.bottom-left {
+        top: 19px;
+        background: linear-gradient(180deg, #818cf8 0%, #4f46e5 100%);
+        clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+        transform-origin: top center;
+        transform: translateX(-7px) rotateY(-90deg) rotateX(-25deg);
+    }
+
+    .eth-nav-face.bottom-right {
+        top: 19px;
+        background: linear-gradient(180deg, #0369a1 0%, #1e1b4b 100%);
+        clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+        transform-origin: top center;
+        transform: translateX(7px) rotateY(90deg) rotateX(-25deg);
+    }
+
+    /* Keyframe Animations (حذف اضافی Blazor) */
+    @@keyframes spinNav3D {
+        0% {
+            transform: rotateX(15deg) rotateY(0deg);
+        }
+        100% {
+            transform: rotateX(15deg) rotateY(360deg);
+        }
+    }
+
+    @@keyframes spinNav3DReverse {
+        0% {
+            transform: rotateX(-15deg) rotateY(360deg);
+        }
+        100% {
+            transform: rotateX(-15deg) rotateY(0deg);
+        }
+    }
+
+    @@keyframes float3D {
+        0% {
+            transform: translateY(-3px);
+        }
+        100% {
+            transform: translateY(3px);
+        }
+    }
+
+    /* Responsive Adjustments */
+    @@media (max-width: 576px) {
+        .brand-text {
+            font-size: 0.95rem;
+        }
+
+        .eth-nav-scene {
+            transform: scale(0.85);
+        }
+
+        .brand-container {
+            gap: 6px;
+        }
+    }
+</style>
+
+<div class="top-row px-3 navbar navbar-dark nav-header-glass">
+    <div class="container-fluid d-flex align-items-center justify-content-between p-0">
+        <a class="navbar-brand me-0 brand-container" href="">
+            <!-- Left 3D Diamond -->
+            <div class="eth-nav-scene">
+                <div class="eth-nav-object">
+                    <div class="eth-nav-face top-front"></div>
+                    <div class="eth-nav-face top-back"></div>
+                    <div class="eth-nav-face top-left"></div>
+                    <div class="eth-nav-face top-right"></div>
+                    <div class="eth-nav-face bottom-front"></div>
+                    <div class="eth-nav-face bottom-back"></div>
+                    <div class="eth-nav-face bottom-left"></div>
+                    <div class="eth-nav-face bottom-right"></div>
+                </div>
+            </div>
+
+            <span class="brand-text">مدیریت پرسنل</span>
+
+            <!-- Right 3D Diamond -->
+            <div class="eth-nav-scene right-side">
+                <div class="eth-nav-object reverse">
+                    <div class="eth-nav-face top-front"></div>
+                    <div class="eth-nav-face top-back"></div>
+                    <div class="eth-nav-face top-left"></div>
+                    <div class="eth-nav-face top-right"></div>
+                    <div class="eth-nav-face bottom-front"></div>
+                    <div class="eth-nav-face bottom-back"></div>
+                    <div class="eth-nav-face bottom-left"></div>
+                    <div class="eth-nav-face bottom-right"></div>
+                </div>
+            </div>
+        </a>
+
+        <button title="منوی دسترسی" class="navbar-toggler border-0 shadow-none p-1" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
     </div>
 </div>
 
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+    <nav class="flex-column nav-pills p-2 gap-1">
+        <div class="nav-item px-2">
+            <NavLink class="nav-link custom-nav-link" href="" Match="NavLinkMatch.All">
+                <i class="bi bi-grid-1x2-fill nav-icon" aria-hidden="true"></i>
+                <span class="nav-text">صفحه اصلی</span>
             </NavLink>
         </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="add-employee">
-                <span class="oi oi-plus" aria-hidden="true"></span> Add Employee
+        <div class="nav-item px-2">
+            <NavLink class="nav-link custom-nav-link" href="add-employee">
+                <i class="bi bi-person-plus-fill nav-icon" aria-hidden="true"></i>
+                <span class="nav-text">افزودن کارمند</span>
             </NavLink>
         </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="identity/accounts/logout">
-                <span class="oi oi-account-logout" aria-hidden="true"></span> Logout
+        <div class="nav-item px-2 mt-auto pt-3 border-top border-secondary-subtle">
+            <NavLink class="nav-link custom-nav-link text-danger-soft" href="identity/accounts/logout">
+                <i class="bi bi-box-arrow-right nav-icon" aria-hidden="true"></i>
+                <span class="nav-text">خروج از حساب</span>
             </NavLink>
         </div>
     </nav>

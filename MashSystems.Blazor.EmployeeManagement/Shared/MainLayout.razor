@@ -1,15 +1,16 @@
 ﻿@inherits LayoutComponentBase
 
-<PageTitle>MashSystems</PageTitle>
+<PageTitle>سامانه مدیریت پرسنل</PageTitle>
 
-<div class="page">
+<div class="page" dir="rtl">
     <div class="sidebar">
         <NavMenu />
     </div>
+
     <AuthorizeView>
         <Authorized>
             <main>
-                <article class="content px-4">
+                <article class="content px-4 py-3">
                     @Body
                 </article>
             </main>
@@ -18,5 +19,4 @@
             <RedirectToLogin />
         </NotAuthorized>
     </AuthorizeView>
-  
 </div>

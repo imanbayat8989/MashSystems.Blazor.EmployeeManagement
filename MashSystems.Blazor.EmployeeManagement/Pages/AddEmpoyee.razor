@@ -3,61 +3,229 @@
 @using MashSystems.Blazor.EmployeeManagement.Models.DTOs;
 @using MashSystems.Blazor.EmployeeManagement.Services;
 
-<Card>
-    <div class="row user-detail-row">
-        <h3>Add New Employee</h3>
-        <div class="form-group">
-            <EditForm Model="@addEmployeeForm" OnValidSubmit="AddNewEmployee">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-                <div class="form-floating mb-3">
-                    <InputText @bind-Value="addEmployeeForm.Name" class="form-control" 
-                    id="floatingInput" placeholder="Name Here!" />
-                    <label for="floatingInput">Name</label>
+<style>
+    .form-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .form-header-title {
+        color: #1e1b4b;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+
+    .custom-floating .form-control,
+    .custom-floating .form-select {
+        border-radius: 12px;
+        border: 1px solid #cbd5e1;
+        padding-right: 1rem;
+        transition: all 0.2s ease-in-out;
+    }
+
+        .custom-floating .form-control:focus,
+        .custom-floating .form-select:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+        }
+
+    .preview-box {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #6366f1;
+        box-shadow: 0 8px 16px rgba(99, 102, 241, 0.2);
+    }
+
+    .preview-placeholder {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: #f1f5f9;
+        border: 2px dashed #cbd5e1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #94a3b8;
+    }
+
+    /* Shared Action Button Sizing */
+    .btn-action {
+        min-width: 180px;
+        height: 48px;
+        border-radius: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+        .btn-action .btn-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .btn-action:hover .btn-icon {
+            transform: scale(1.2) rotate(-10deg);
+        }
+
+        .btn-action:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+    /* Animated Submit Button (Right side in RTL) */
+    .btn-submit-employee {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        color: #ffffff !important;
+        border: none;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+    }
+
+        .btn-submit-employee:hover {
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.45);
+            transform: translateY(-2px);
+        }
+
+    /* Dark Red Animated Cancel Button (Left side in RTL) */
+    .btn-cancel-darkred {
+        background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%);
+        color: #ffffff !important;
+        border: none;
+        box-shadow: 0 4px 14px rgba(153, 27, 27, 0.3);
+    }
+
+        .btn-cancel-darkred:hover {
+            background: linear-gradient(135deg, #7f1d1d 0%, #581c87 0%, #450a0a 100%);
+            box-shadow: 0 8px 25px rgba(127, 29, 29, 0.45);
+            transform: translateY(-2px);
+        }
+
+    .validation-message-box {
+        border-radius: 12px;
+        background-color: #fef2f2;
+        border: 1px solid #fecaca;
+    }
+</style>
+
+<div class="container py-4" dir="rtl">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <div class="card form-card p-4 p-md-5">
+                <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+                    <div class="p-3 bg-indigo-subtle rounded-circle text-indigo">
+                        <i class="bi bi-person-plus-fill fs-3 text-primary"></i>
+                    </div>
+                    <div>
+                        <h3 class="form-header-title mb-1">افزودن کارمند جدید</h3>
+                        <p class="text-muted small mb-0">مشخصات پرسنلی و اطلاعات شغلی کارمند جدید را وارد کنید.</p>
+                    </div>
                 </div>
 
-                <div class="form-floating mb-3">
-                    <InputNumber @bind-Value="addEmployeeForm.Salary" class="form-control"
-                               id="floatingInput" placeholder="Salary Here!" />
-                    <label for="floatingInput">Salary</label>
-                </div>
+                <EditForm Model="@addEmployeeForm" OnValidSubmit="AddNewEmployee">
+                    <DataAnnotationsValidator />
 
-                <div class="form-floating mb-3">
-                    <InputSelect @bind-Value="addEmployeeForm.Type" class="form-select"
-                               id="floatingInput" placeholder="Type Here!">
-                               @foreach(EmployeeType type in Enum.GetValues(typeof(EmployeeType)))
+                    <div class="validation-message-box p-3 mb-4 text-danger small">
+                        <ValidationSummary />
+                    </div>
+
+                    <!-- Image Preview Avatar -->
+                    <div class="d-flex justify-content-center align-items-center mb-4">
+                        @if (!string.IsNullOrWhiteSpace(addEmployeeForm.ImgUrl))
                         {
-                            <option value="@type">@type.GetDisplayName()</option>
+                            <img src="@addEmployeeForm.ImgUrl" alt="پیش‌نمایش تصویر" class="preview-box" />
                         }
-                        <label for="floatingInput">Name</label>
-                    </InputSelect>
-                </div>
-
-                <div class="form-floating mb-3">
-                    <InputSelect @bind-Value="addEmployeeForm.Position" class="form-select"
-                                 id="floatingInput" placeholder="Position Here!">
-                        @foreach (Position position in Enum.GetValues(typeof(Position)))
+                        else
                         {
-                            <option value="@position">@position.GetDisplayName()</option>
+                            <div class="preview-placeholder">
+                                <i class="bi bi-person fs-1"></i>
+                            </div>
                         }
-                        <label for="floatingInput">Position</label>
-                    </InputSelect>
-                </div>
+                    </div>
 
-                <div class="form-floating mb-3">
-                    <InputText @bind-Value="addEmployeeForm.ImgUrl" class="form-control"
-                               id="floatingInput" placeholder="Url Here!" />
-                    <label for="floatingInput">Image Url</label>
-                </div>
-                <button class="btn btn-outline-secondary" type="submit">Submit</button>
-            </EditForm>
+                    <div class="row g-3">
+                        <!-- Employee Name -->
+                        <div class="col-md-6">
+                            <div class="form-floating custom-floating mb-3">
+                                <InputText @bind-Value="addEmployeeForm.Name" class="form-control" id="employeeName" placeholder="نام و نام خانوادگی" />
+                                <label for="employeeName">نام و نام خانوادگی</label>
+                            </div>
+                        </div>
+
+                        <!-- Salary -->
+                        <div class="col-md-6">
+                            <div class="form-floating custom-floating mb-3">
+                                <InputNumber @bind-Value="addEmployeeForm.Salary" class="form-control" id="employeeSalary" placeholder="حقوق (تومان)" />
+                                <label for="employeeSalary">حقوق دریافتی (تومان)</label>
+                            </div>
+                        </div>
+
+                        <!-- Employee Type -->
+                        <div class="col-md-6">
+                            <div class="form-floating custom-floating mb-3">
+                                <InputSelect @bind-Value="addEmployeeForm.Type" class="form-select" id="employeeType">
+                                    <option value="" disabled selected>انتخاب نوع همکاری...</option>
+                                    @foreach (EmployeeType type in Enum.GetValues(typeof(EmployeeType)))
+                                    {
+                                        <option value="@type">@type.GetDisplayName()</option>
+                                    }
+                                </InputSelect>
+                                <label for="employeeType">نوع همکاری</label>
+                            </div>
+                        </div>
+
+                        <!-- Position -->
+                        <div class="col-md-6">
+                            <div class="form-floating custom-floating mb-3">
+                                <InputSelect @bind-Value="addEmployeeForm.Position" class="form-select" id="employeePosition">
+                                    <option value="" disabled selected>انتخاب سمت شغلی...</option>
+                                    @foreach (Position position in Enum.GetValues(typeof(Position)))
+                                    {
+                                        <option value="@position">@position.GetDisplayName()</option>
+                                    }
+                                </InputSelect>
+                                <label for="employeePosition">سمت شغلی</label>
+                            </div>
+                        </div>
+
+                        <!-- Image URL -->
+                        <div class="col-12">
+                            <div class="form-floating custom-floating mb-4">
+                                <InputText @bind-Value="addEmployeeForm.ImgUrl" class="form-control" id="employeeImgUrl" placeholder="آدرس تصویر" />
+                                <label for="employeeImgUrl">لینک تصویر پروفایل (URL)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Split Action Buttons across the form width -->
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top gap-2">
+                        <!-- Submit Button on the Right side in RTL -->
+                        <button class="btn btn-action btn-submit-employee gap-2" type="submit">
+                            <i class="bi bi-check-circle-fill btn-icon fs-5"></i>
+                            <span>ثبت اطلاعات کارمند</span>
+                        </button>
+
+                        <!-- Dark Red Cancel Button on the Left side in RTL -->
+                        <a href="/" class="btn btn-action btn-cancel-darkred gap-2">
+                            <i class="bi bi-x-lg btn-icon fs-5"></i>
+                            <span>انصراف</span>
+                        </a>
+                    </div>
+                </EditForm>
+            </div>
         </div>
     </div>
-</Card>
+</div>
 
 @code {
-    [Inject] private IEmployeeService EmployeeService { get; set; }
-    [Inject] private NavigationManager NavigationManager { get; set; }
+    [Inject] private IEmployeeService EmployeeService { get; set; } = default!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
 
     private AddEmployeeForm addEmployeeForm = new();
 
